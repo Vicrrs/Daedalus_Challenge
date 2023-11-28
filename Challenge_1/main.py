@@ -14,13 +14,17 @@ ZONE = np.array([
     [1009, 393],
 ])
 
+
 def get_center(bbox):
     center = ((bbox[0] + bbox[2]) // 2, (bbox[1] + bbox[3]) // 2)
     return center
 
+
 def load_model():
-    model = torch.hub.load("ultralytics/yolov5", model="yolov5n", pretrained=True)
+    model = torch.hub.load("ultralytics/yolov5",
+                           model="yolov5n", pretrained=True)
     return model
+
 
 def get_bboxes(preds: object):
     df = preds.pandas().xyxy[0]
@@ -36,7 +40,8 @@ def is_valid_detection(xc, yc):
 
 def count_cars(cap: object):
 
-    model = torch.hub.load("ultralytics/yolov5", model="yolov5n", pretrained=True)
+    model = torch.hub.load("ultralytics/yolov5",
+                           model="yolov5n", pretrained=True)
     count = 0
     while cap.isOpened():
         status, frame = cap.read()
@@ -50,29 +55,33 @@ def count_cars(cap: object):
         detections = 0
         for box in bboxes:
             xc, yc = get_center(box)
-            
+
             if is_valid_detection(xc, yc):
                 detections += 1
-            
-            cv2.circle(img=frame, center=(xc, yc), radius=5, color=(0,255,0), thickness=-1)
-            cv2.rectangle(img=frame, pt1=(box[0], box[1]), pt2=(box[2], box[3]), color=(255, 0, 0), thickness=1)
 
-        cv2.putText(img=frame, text=f"Cars: {detections}", org=(100, 100), fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=3, color=(0,0,0), thickness=3)
-        cv2.polylines(img=frame, pts=[ZONE], isClosed=True, color=(0,0,255), thickness=4)
+            cv2.circle(img=frame, center=(xc, yc), radius=5,
+                       color=(0, 255, 0), thickness=-1)
+            cv2.rectangle(img=frame, pt1=(box[0], box[1]), pt2=(
+                box[2], box[3]), color=(255, 0, 0), thickness=1)
+
+        cv2.putText(img=frame, text=f"Cars: {detections}", org=(
+            100, 100), fontFace=cv2.FONT_HERSHEY_PLAIN, fontScale=3, color=(0, 0, 0), thickness=3)
+        cv2.polylines(img=frame, pts=[ZONE], isClosed=True, color=(
+            0, 0, 255), thickness=4)
 
         cv2.imshow("frame", frame)
         cv2.imwrite(f"frame_{count}.png", frame)
         count += 1
 
         if cv2.waitKey(10) & 0xFF == ord('q'):
-             break
-    
+            break
+
     cap.release()
 
 
 if __name__ == '__main__':
 
-    cap = cv2.VideoCapture("/home/tkroza/PycharmProjects/Vicsion_Challenge/Challenge_1/video/video.mp4")
-    
+    cap = cv2.VideoCapture(
+        r"C:\Users\rozas\Documents\Projects\Vicsion_Challenge\Challenge_1\video\video.mp4")
+
     count_cars(cap)
-    
